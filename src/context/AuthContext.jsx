@@ -30,6 +30,11 @@ export function AuthProvider({ children }) {
       return { error: null, needsEmailConfirmation: !data.session }
     },
     async logout() { if (supabase) await supabase.auth.signOut() },
+    async requestPasswordReset(email) {
+      if (!isSupabaseConfigured) return { error: 'Falta configurar la conexión con Supabase.' }
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/restablecer-contrasena` })
+      return { error: error?.message ?? null }
+    },
   }), [user, isLoading])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
