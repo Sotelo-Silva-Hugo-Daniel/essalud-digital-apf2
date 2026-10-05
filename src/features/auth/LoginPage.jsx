@@ -1,0 +1,11 @@
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Logo } from '../../components/AppHeader'
+import { useAuth } from '../../context/useAuth'
+
+export default function LoginPage() {
+  const [document, setDocument] = useState(''); const [password, setPassword] = useState(''); const [visible, setVisible] = useState(false); const [error, setError] = useState('')
+  const { login } = useAuth(); const navigate = useNavigate(); const location = useLocation()
+  const submit = e => { e.preventDefault(); if (!document.trim() || !password.trim()) return setError('Ingresa tu documento y contraseña para continuar.'); login(); navigate(location.state?.from?.pathname || '/inicio', { replace: true }) }
+  return <main className="login-page"><section className="login-panel"><div className="login-content"><div className="login-brand"><Logo /></div><p className="eyebrow">PORTAL DE SALUD DIGITAL</p><h1>Tu salud, más cerca de ti</h1><p className="lead">Ingresa para gestionar tus citas y teleconsultas de manera simple y segura.</p><form onSubmit={submit} noValidate><label>Documento de identidad<input value={document} onChange={e => setDocument(e.target.value)} inputMode="numeric" placeholder="Ingresa tu DNI" /></label><label>Contraseña<span className="password-field"><input value={password} onChange={e => setPassword(e.target.value)} type={visible ? 'text' : 'password'} placeholder="Ingresa tu contraseña" /><button type="button" onClick={() => setVisible(!visible)}>{visible ? 'Ocultar' : 'Ver'}</button></span></label>{error && <p className="form-error">{error}</p>}<button className="primary-button" type="submit">Ingresar al portal</button></form><button className="text-action" type="button">¿Olvidaste tu contraseña?</button><p className="account-link">¿Aún no tienes una cuenta? <Link to="/registro">Regístrate</Link></p><div className="demo-notice"><b>Modo demostración</b><span>Usa cualquier dato en ambos campos. No se almacenan datos personales.</span></div></div></section><aside className="login-aside"><div><span className="aside-icon">+</span><h2>Atención médica sin traslados innecesarios</h2><p>Reserva y confirma tu teleconsulta con toda la información a la vista.</p></div><small>Prototipo académico · EsSalud Digital</small></aside></main>
+}

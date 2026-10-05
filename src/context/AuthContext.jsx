@@ -1,0 +1,3 @@
+import { useMemo, useState } from 'react'
+import { AuthContext } from './authStore'
+export function AuthProvider({ children }) { const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('essalud-demo-user') || 'null')); const saveUser = person => { localStorage.setItem('essalud-demo-user', JSON.stringify(person)); setUser(person) }; const value = useMemo(() => ({ user, login: () => saveUser({ name: 'María', email: 'maria.demo@essalud.pe' }), register: (name, email) => saveUser({ name, email }), logout: () => { localStorage.removeItem('essalud-demo-user'); setUser(null) } }), [user]); return <AuthContext.Provider value={value}>{children}</AuthContext.Provider> }
