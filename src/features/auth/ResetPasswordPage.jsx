@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Logo } from '../../components/AppHeader'
+import AccessibilityControls from '../../components/AccessibilityControls'
 import { useAuth } from '../../context/useAuth'
 import { supabase } from '../../lib/supabase'
 
@@ -25,9 +26,10 @@ export default function ResetPasswordPage() {
     navigate('/login', { replace: true, state: { notice: 'Contraseña actualizada. Ya puedes iniciar sesión.' } })
   }
 
-  if (isLoading) return <main className="auth-loading">Verificando el enlace de recuperación…</main>
+  if (isLoading) return <main className="auth-loading" role="status" aria-live="polite">Verificando el enlace de recuperación…</main>
 
   return <main className="login-page">
+    <div className="auth-accessibility"><AccessibilityControls compact /></div>
     <section className="login-panel">
       <div className="login-content">
         <div className="login-brand"><Logo /></div>
@@ -41,12 +43,12 @@ export default function ResetPasswordPage() {
           <form onSubmit={submit}>
             <label>Nueva contraseña<input value={password} onChange={event => setPassword(event.target.value)} type="password" autoComplete="new-password" /></label>
             <label>Confirmar nueva contraseña<input value={confirmation} onChange={event => setConfirmation(event.target.value)} type="password" autoComplete="new-password" /></label>
-            {error && <p className="form-error">{error}</p>}
+            {error && <p className="form-error" role="alert">{error}</p>}
             <button className="primary-button" disabled={!isConfigured || busy} type="submit">{busy ? 'Actualizando…' : 'Guardar nueva contraseña'}</button>
           </form>
         </>}
       </div>
     </section>
-    <aside className="login-aside"><div><span className="aside-icon">+</span><h2>Tu acceso, protegido</h2><p>La recuperación se realiza mediante un enlace de un solo uso enviado a tu correo.</p></div><small>Prototipo académico · EsSalud Digital</small></aside>
+    <aside className="login-aside"><div><span aria-hidden="true" className="aside-icon">+</span><h2>Tu acceso, protegido</h2><p>La recuperación se realiza mediante un enlace de un solo uso enviado a tu correo.</p></div><small>Prototipo académico · EsSalud Digital</small></aside>
   </main>
 }

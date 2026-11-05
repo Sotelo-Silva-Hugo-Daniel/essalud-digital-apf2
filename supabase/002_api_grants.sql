@@ -7,3 +7,4 @@ grant select on public.doctors to authenticated;
 grant select on public.availability_slots to authenticated;
 grant select on public.appointments to authenticated;
 grant execute on function public.book_appointment(uuid) to authenticated;
+grant execute on function public.cancel_appointment(uuid) to authenticated;
