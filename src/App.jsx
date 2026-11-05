@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AppHeader, BackLink, Progress } from './components/AppHeader'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext.jsx'
@@ -57,7 +57,7 @@ function CancelAppointmentDialog({ appointment, onClose, onConfirm, isCancelling
 }
 function Layout({ children }) { const [helpOpen,setHelpOpen]=useState(false); const triggerRef = useRef(null); const closeHelp = () => { setHelpOpen(false); window.setTimeout(() => triggerRef.current?.focus(), 0) }; return <div className="app-shell"><a className="skip-link" href="#contenido-principal">Saltar al contenido principal</a><AppHeader onHelp={event=>{ triggerRef.current = event.currentTarget; setHelpOpen(true) }} />{children}{helpOpen&&<HelpDialog onClose={closeHelp} />}</div> }
 function Avatar({ person }) { return <span aria-hidden="true" className={`avatar ${person.tone}`}>{person.initials}</span> }
-function SummaryRow({ label, value, onEdit }) { return <div className="summary-row"><span><small>{label}</small><b>{value}</b></span>{onEdit && <button onClick={onEdit}>Editar</button>}</div> }
+function SummaryRow({ label, value, onEdit }) { const accessibleLabel = `Editar ${label.toLowerCase()}`; return <div className="summary-row"><span><small>{label}</small><b>{value}</b></span>{onEdit && <button aria-label={accessibleLabel} onClick={onEdit}>Editar</button>}</div> }
 function Loading({ message = 'Cargando información…' }) { return <p className="data-message" role="status" aria-live="polite">{message}</p> }
 function DataError({ message }) { return <p className="data-error" role="alert">No pudimos cargar los datos. {message}</p> }
 
@@ -105,5 +105,24 @@ function Appointments() {
   return <Layout>{cancelTarget && <CancelAppointmentDialog appointment={cancelTarget} error={cancelError} isCancelling={isCancelling} onClose={() => { setCancelError(''); setCancelTarget(null) }} onConfirm={cancelAppointment} />}<main id="contenido-principal" tabIndex="-1" className="booking-page"><BackLink>Inicio</BackLink><h1>Mis citas programadas</h1>{notice && <p className="form-success" role="status">{notice}</p>}{loading ? <Loading /> : loadError ? <DataError message={loadError} /> : activeItems.length ? activeItems.map(item => { const slot = item.availability_slots; const doctor = slot?.doctors; const isExpanded = expandedId === item.id; return <section className="appointment-card" key={item.id}><span className="status">Confirmada</span><h2>Teleconsulta médica</h2><p><b>{doctor?.full_name}</b><br />{formatDate(slot?.appointment_date)} · {formatTime(slot?.appointment_time || '00:00')}</p>{isExpanded && <div className="appointment-extra"><span>Especialidad</span><b>{doctor?.specialty}</b><span>Código de cita</span><b>{item.confirmation_code}</b><span>Modalidad</span><b>Videollamada</b></div>}<button type="button" className="outline-button" aria-expanded={isExpanded} onClick={() => setExpandedId(isExpanded ? null : item.id)}>{isExpanded ? 'Ocultar detalle' : 'Ver detalle'}</button><button type="button" className="cancel-button" onClick={() => { setCancelError(''); setCancelTarget(item) }}>Cancelar cita</button></section> }) : <div className="empty-state" role="status"><span aria-hidden="true">▣</span><h2>No tienes citas programadas</h2><p>Cuando reserves una teleconsulta, aparecerá aquí.</p><Link className="primary-button" to="/reserva/medico">Agendar teleconsulta</Link></div>}</main></Layout>
 }
 
+function RouteTitle() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const titles = [
+      [/^\/login$/, 'Iniciar sesión'],
+      [/^\/registro$/, 'Crear cuenta'],
+      [/^\/restablecer-contrasena$/, 'Recuperar contraseña'],
+      [/^\/inicio$/, 'Inicio'],
+      [/^\/reserva\/medico$/, 'Seleccionar médico'],
+      [/^\/reserva\/horario$/, 'Seleccionar fecha y hora'],
+      [/^\/reserva\/revision$/, 'Revise su cita'],
+      [/^\/reserva\/confirmacion/, 'Cita confirmada'],
+      [/^\/mis-citas$/, 'Mis citas programadas']
+    ]
+    const match = titles.find(([pattern]) => pattern.test(pathname))
+    document.title = `${match?.[1] || 'EsSalud Digital'} - EsSalud Digital`
+  }, [pathname])
+  return null
+}
 function AppRoutes() { const [booking, setBooking] = useBooking(); const [appointment, setAppointment] = useState(null); return <Routes><Route path="/login" element={<LoginPage />} /><Route path="/registro" element={<RegisterPage />} /><Route path="/restablecer-contrasena" element={<ResetPasswordPage />} /><Route path="/*" element={<ProtectedRoute><Routes><Route path="/inicio" element={<Home />} /><Route path="/reserva/medico" element={<DoctorPage booking={booking} setBooking={setBooking} />} /><Route path="/reserva/horario" element={<SchedulePage booking={booking} setBooking={setBooking} />} /><Route path="/reserva/revision" element={<ReviewPage booking={booking} setBooking={setBooking} setAppointment={setAppointment} />} /><Route path="/reserva/confirmacion/:appointmentId" element={<Confirmation appointment={appointment} />} /><Route path="/mis-citas" element={<Appointments />} /><Route path="*" element={<Navigate to="/inicio" replace />} /></Routes></ProtectedRoute>} /></Routes> }
-export default function App() { return <AccessibilityProvider><AuthProvider><BrowserRouter><AppRoutes /></BrowserRouter></AuthProvider></AccessibilityProvider> }
+export default function App() { return <AccessibilityProvider><AuthProvider><BrowserRouter><RouteTitle /><AppRoutes /></BrowserRouter></AuthProvider></AccessibilityProvider> }
