@@ -26,3 +26,11 @@ html[data-contrast="high"] .mobile-nav{background:#fff;border-color:#000}html[da
 .week-navigation{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 16px;color:var(--ink);text-align:center}.week-navigation button{min-width:48px;min-height:48px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--blue);font-size:26px}.week-navigation button:disabled{opacity:.45}.reschedule-days{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;margin-bottom:20px}.reschedule-days button{min-height:52px;padding:8px;border:2px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-weight:700;text-transform:capitalize}.reschedule-days button.active{border-color:var(--blue);background:var(--blue);color:#fff}.hours-heading{font-size:15px;color:var(--ink);font-weight:700;text-transform:capitalize;margin:0 0 12px}.reschedule-slots{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-bottom:16px}.slot-choice{min-height:52px;align-items:center;text-align:center;font-size:16px;font-weight:800}.reschedule-bottom{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 0 5px}.reschedule-bottom p{margin:0 0 8px;color:var(--ink);font-size:13px}.reschedule-page .reschedule-bottom .primary-button{margin:0}
 @media(max-width:700px){.reschedule-bottom{bottom:72px}.reschedule-days{grid-template-columns:repeat(auto-fit,minmax(58px,1fr))}}
 html[data-contrast="high"] .reschedule-days button.active{background:#0039a6;color:#fff}html[data-contrast="high"] .reschedule-bottom{background:#fff;border-color:#000}
+
+/* Safari en iPhone amplía la página al enfocar campos con texto menor de 16 px. */
+@media(max-width:780px){
+  input:not([type="checkbox"]):not([type="radio"]),select,textarea{font-size:16px}
+  html[data-text-size="large"] input:not([type="checkbox"]):not([type="radio"]),
+  html[data-text-size="large"] select,
+  html[data-text-size="large"] textarea{font-size:18px}
+}
